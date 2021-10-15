@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Generate</h1>
+
+    <button class="btn btn-primary" id="btn-generate">Generate key</button>
+
+    <form action="" style="margin-top:20px;">
+      <div class="form-group" >
+        <label for="privateKey">Private key</label>
+        <textarea type="text" class="form-control" id="privateKey" readonly cols="30" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="publicKey">Public key</label>
+        <textarea type="text" class="form-control" id="publicKey" readonly></textarea>
+      </div>
+    </form>
+
+    <hr>
+    <hr>
+    <div><h1>Signature</h1></div>
+    <div>
+      <div class="form-group">
+        <label >Private key</label>
+        <textarea type="text" class="form-control" id="privateKey_toSign"></textarea>
+        <span id="err_privKey"></span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-5">
+        <div>
+          <label>Text</label>
+          <textarea name="txt" id="text_toSign" cols="50" rows="5"></textarea>
+        </div>
+      </div>
+      <div class="col-2" style="height: 200px;">
+        <button class="btn-success" style="margin-top: 50px; height: 50px;" id="btn-sign">Signature</button>
+      </div>
+      <div class="col-5">
+        <div>
+          <label>Signature</label>
+          <textarea name="txt" id="result" cols="50" rows="5" readonly></textarea>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <hr>
+    <div>
+      <h1>Verify</h1>
+      <div>
+        <div class="form-group">
+          <label >Public key</label>
+          <textarea type="text" class="form-control" id="publicKey_toVerify"></textarea>
+        </div>
+        <div class="form-group">
+          <label >Signature</label>
+          <textarea type="text" class="form-control" id="signature_toVerify"></textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-5">
+          <div>
+            <label>Text</label>
+            <textarea name="txt" id="text_toTest" cols="50" rows="5"></textarea>
+          </div>
+        </div>
+        <div class="col-2" style="height: 200px;">
+          <button class="btn-success" style="margin-top: 50px; height: 50px;" id="btn-verify">Verify</button>
+        </div>
+        <div class="col-5">
+          <div>
+            <label>Result</label>
+            <div id="result_verify" style="color: green;font-size: 50px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script>
+    $("#text_toSign").keyup(function (e) { 
+      $("#text_toTest").val($(this).val());
+    });
+
+    $("#privateKey_toSign").keyup(function (e) { 
+      $("#privateKey").val($(this).val());
+      $.get("/api/getPublicKey",{privateKey:$(this).val()},function(data){
+        if(data.status=="success")
+        {
+          $("#publicKey").val(data.publicKey);
+          $("#publicKey_toVerify").val(data.publicKey);   
+          $("#err_privKey").text("");
+        }
+        else{
+          $("#err_privKey").text(data.message);
+          $("#err_privKey").css("color","red")
+        }
+      })
+      $("#result").val("");
+      $("#signature_toVerify").val("");
+    });
+
+    $("#btn-generate").click(function () { 
+      $.get("/api/generateKey", function (data, textStatus, jqXHR) {
+            $("#privateKey").val(data.private_key);
+            $("#privateKey_toSign").val(data.private_key);
+            $("#publicKey").val(data.public_key);
+            $("#publicKey_toVerify").val(data.public_key);   
+        }
+      );
+    });
+    $("#btn-sign").click(function () { 
+      let privKey = $("#privateKey_toSign").val();
+      let message = $("#text_toSign").val();
+      $.get("/api/signature",{privKey:privKey, message:message},function(data){
+        $("#result").val(data);
+        $("#signature_toVerify").val(data);
+      })
+    });
+    $("#btn-verify").click(function () { 
+      let pubKey = $("#publicKey_toVerify").val();
+      let message = $("#text_toTest").val();
+      let signature = $("#signature_toVerify").val();
+      var result ;
+      $.get("/api/verify",{pubKey:pubKey, message:message, signature:signature},function(data){
+        $("#result_verify").text(data)
+        
+      }).then(function(data){
+        if(data.toString()=="true")
+        {
+          $("#result_verify").css("color","green")
+        }
+        else{
+          $("#result_verify").css("color","red")
+        }
+      })
+    });
+    $(document).ready(function () {
+      $.get("/api/generateKey", function (data, textStatus, jqXHR) {
+            $("#privateKey").val(data.private_key);
+            $("#privateKey_toSign").val(data.private_key);
+            $("#publicKey").val(data.public_key);
+            $("#publicKey_toVerify").val(data.public_key);   
+        }
+      );
+    });
+  </script>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+    <h1>Transaction</h1>
+    <div class="row">
+        <div class="col-3"><label for="transactionHash">Transaction Hash</label></div>
+        <div class="col-7"><input type="text" class="form-control" id="transactionHash" ></div>
+        <div class="col-2"><button class="btn btn-primary" id="btn-get">Get inform</button></div>
+    </div>
+    <div><div style="margin-top:10px; font-size: 20px;" > Status: <span id="status"></span></div></div>
+    <div style="margin-top: 10px;">
+        <ul class="list-group">
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">From: </div>
+                    <div class="col-5" id="elm-from"></div>
+                </div>
+                
+            </li>
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">To: </div>
+                    <div class="col-5" id="elm-to"></div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">Amount: </div>
+                    <div class="col-5" id="elm-amount"></div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">Block height: </div>
+                    <div class="col-5" id="elm-blockHeight"></div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">Hash: </div>
+                    <div class="col-5" id="elm-hash"></div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class = "row">
+                    <div class="col-3 label-txt">Contract address: </div>
+                    <div class="col-5" id="elm-contractAddress"></div>
+                </div>
+            </li>
+          </ul>
+    </div>
+
+</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        function setInform(from,to,amount,hash,blockHeight,contractAddress){
+            $("#elm-from").text(from);
+            $("#elm-to").text(to);
+            $("#elm-amount").text(amount);
+            $("#elm-hash").text(hash);
+            $("#elm-blockHeight").text(blockHeight);
+            $("#elm-contractAddress").text(contractAddress);
+        }
+        $("#btn-get").click(function (e) { 
+            var hash = $("#transactionHash").val();
+            setInform("Loading...","Loading...","Loading...","Loading...","Loading...","Loading...")
+            $.get("/api/getTransactionERC20",{transactionHash:hash},function(data){
+                if(data.status==null){
+                    setInform(
+                        data.transfer[0].from,
+                        data.transfer[0].to,
+                        data.transfer[0].amount,
+                        data.hash,
+                        data.blockHeight,
+                        data.contractAddress
+                    )
+                    $("#status").text("Success");
+                    $("#status").css("color","green")
+                }
+                else{
+                    setInform("","","","","","")
+                    var status = data.status
+                    if(status=="failed"){
+                        $("#status").text(data.message);
+                        $("#status").css("color","red")
+                    }
+                    
+                }
+            })
+            
+            
+        });
+    </script>
+</html>

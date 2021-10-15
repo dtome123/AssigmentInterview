@@ -1,0 +1,26 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+h1{
+  background-color: rgb(22, 96, 161);
+  color: white;
+  padding: 10px;
+}
+label{
+  font-weight: bold;
+  font-size: 20px;
+}
+hr{
+  font-weight: bold;
+}
+.label-txt{
+  width: 100px;
+}
+.form-group{
+  width: 70%;
+}
