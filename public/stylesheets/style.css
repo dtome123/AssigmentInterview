@@ -20,6 +20,7 @@ hr{
 }
 .label-txt{
   width: 100px;
+  font-weight: bold;
 }
 .form-group{
   width: 70%;
