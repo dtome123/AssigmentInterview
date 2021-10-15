@@ -18,26 +18,27 @@
     </div>
     <div><div style="margin-top:10px; font-size: 20px;" > Status: <span id="status"></span></div></div>
     <div style="margin-top: 10px;">
+
+        <div>
+            <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th scope="col">From</th>
+                    <th scope="col">To</th>
+                    <th scope="col">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="content-tranfers">
+                  <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
         <ul class="list-group">
-            <li class="list-group-item">
-                <div class = "row">
-                    <div class="col-3 label-txt">From: </div>
-                    <div class="col-5" id="elm-from"></div>
-                </div>
-                
-            </li>
-            <li class="list-group-item">
-                <div class = "row">
-                    <div class="col-3 label-txt">To: </div>
-                    <div class="col-5" id="elm-to"></div>
-                </div>
-            </li>
-            <li class="list-group-item">
-                <div class = "row">
-                    <div class="col-3 label-txt">Amount: </div>
-                    <div class="col-5" id="elm-amount"></div>
-                </div>
-            </li>
+            
             <li class="list-group-item">
                 <div class = "row">
                     <div class="col-3 label-txt">Block height: </div>
@@ -64,23 +65,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script>
-        function setInform(from,to,amount,hash,blockHeight,contractAddress){
-            $("#elm-from").text(from);
-            $("#elm-to").text(to);
-            $("#elm-amount").text(amount);
+        function setInform(transfers,hash,blockHeight,contractAddress){
+            // $("#elm-from").text(from);
+            // $("#elm-to").text(to);
+            // $("#elm-amount").text(amount);
+            var s="";
+            transfers.forEach(element => {
+                s+=`<tr>
+                        <td>${element.from}</td>
+                        <td>${element.to}</td>
+                        <td>${element.amount}</td>
+                    </tr>`
+                
+            });
+            $("#content-tranfers").html(s)
             $("#elm-hash").text(hash);
             $("#elm-blockHeight").text(blockHeight);
             $("#elm-contractAddress").text(contractAddress);
         }
         $("#btn-get").click(function (e) { 
             var hash = $("#transactionHash").val();
-            setInform("Loading...","Loading...","Loading...","Loading...","Loading...","Loading...")
+            
+            setInform([{from:"Loading...",to:"Loading...",amount:"Loading..."}],"Loading...","Loading...","Loading...")
+            $("#status").text("Loading");
+            $("#status").css("color","blue")
             $.get("/api/getTransactionERC20",{transactionHash:hash},function(data){
                 if(data.status==null){
                     setInform(
-                        data.transfer[0].from,
-                        data.transfer[0].to,
-                        data.transfer[0].amount,
+                        data.transfer,
                         data.hash,
                         data.blockHeight,
                         data.contractAddress
@@ -89,7 +101,7 @@
                     $("#status").css("color","green")
                 }
                 else{
-                    setInform("","","","","","")
+                    setInform([],"","","")
                     var status = data.status
                     if(status=="failed"){
                         $("#status").text(data.message);
