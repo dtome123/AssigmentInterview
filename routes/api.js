@@ -85,25 +85,30 @@ router.get('/getTransactionERC20', function(req, res, next) {
         } 
     }
     else{
+      
       let logs = obj.result.logs;
+     
+      var hash=obj.result.transactionHash;
+      var blockHeight= parseInt(obj.result.blockNumber);
+      var contractAddress= obj.result.to;
+
       if(logs.length!=0){
-        let result;
+        var transfers=[];
+        
         logs.forEach(element => {
           if(element.topics[0]=="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"){
-            result = element;
-            return;
+            var jsonObject = new Object();
+            jsonObject.from=element.topics[1].replace("0x000000000000000000000000","0x");
+            jsonObject.to=element.topics[2].replace("0x000000000000000000000000","0x");
+            jsonObject.amount=parseInt(element.data);
+            transfers.push(jsonObject);
           }
         });
-        
         json= {
-          transfer:[{
-            from:result.topics[1].replace("0x000000000000000000000000","0x"),
-            to:result.topics[2].replace("0x000000000000000000000000","0x"),
-            amount:parseInt(result.data),
-          }],
-          hash:result.transactionHash,
-          blockHeight:parseInt(result.blockNumber),
-          contractAddress:result.address
+          transfer:transfers,
+          hash:hash,
+          blockHeight:blockHeight,
+          contractAddress:contractAddress
         }
       }
       else{
