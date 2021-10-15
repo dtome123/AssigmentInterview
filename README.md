@@ -1,7 +1,7 @@
 # API server
   Environment: Nodejs
   Prort : 3000
-1/ Signing and verifying
+**1) Signing and verifying**
   a) Signing
   - path:localhost:3000/api/signature 
   - parameter:
@@ -27,7 +27,8 @@
     => **result**: true
   
   _Note: Hash function used for input text is sha256_
-2/ Get information of ERC20 transaction 
+
+**2) Get information of ERC20 transaction **
   - path: localhost:3000/api/getTransactionERC20
   - parameter:
     + transactionHash: transaction hash
@@ -50,7 +51,7 @@
    _Note: Endpoint configed in Infura is **mainnet** (file: .env)_
  
 # Web interface
-1/ Signing and verifying
+**1) Signing and verifying**
   **URL to access: http://localhost:3000/**
   a) Generate key:
    ![image](https://user-images.githubusercontent.com/48994663/137430670-c062d8f9-bed8-40bb-987e-d41f45aa57f2.png)
@@ -59,6 +60,6 @@
   c) Verifying
   ![image](https://user-images.githubusercontent.com/48994663/137430837-63a789dd-669b-4235-bcfd-097dad840254.png)
 
-2/ Information of ERC20 transaction
+**2) Information of ERC20 transaction**
   ![image](https://user-images.githubusercontent.com/48994663/137430910-aa37dd13-948f-454f-b790-38352799403d.png)
   
